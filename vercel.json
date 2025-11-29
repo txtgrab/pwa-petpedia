@@ -1,0 +1,24 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "petpedia-backend/server.js",
+        "use": "@vercel/node"
+      },
+      {
+        "src": "petpedia-pwa/package.json",
+        "use": "@vercel/static-build",
+        "config": { "distDir": "dist" }
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/(.*)",
+        "dest": "/petpedia-backend/server.js"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/petpedia-pwa/$1"
+      }
+    ]
+  }

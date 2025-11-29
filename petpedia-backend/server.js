@@ -244,3 +244,5 @@ app.get('/api/docs', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server Backend SIAP di http://localhost:${PORT}`);
 });
+
+module.exports = app;
