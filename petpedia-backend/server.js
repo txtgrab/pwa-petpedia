@@ -10,26 +10,25 @@ const { createClient } = require('@supabase/supabase-js');
 const app = express();
 const PORT = 3000;
 
-const swaggerSpec = {
+const apiDocs = {
   openapi: "3.0.0",
   info: {
-    title: "PetPedia API Docs",
+    title: "PetPedia API Documentation",
     version: "1.0.0",
-    description: "Dokumentasi REST API untuk Aplikasi PetPedia PWA."
+    description: "Dokumentasi Lengkap API PetPedia. Dibuat oleh Fajar Herdiansyah."
   },
   servers: [
-    { url: "https://pwa-petpedia.vercel.app", description: "Production Server" },
-    { url: "http://localhost:3000", description: "Local Server" }
+    { url: "https://pwa-petpedia.vercel.app", description: "Server Utama" }
   ],
   paths: {
     "/api/animals": {
       get: {
-        summary: "Ambil semua hewan",
+        summary: "Melihat Semua Hewan",
         tags: ["Hewan"],
-        responses: { "200": { description: "Sukses" } }
+        responses: { "200": { description: "Berhasil" } }
       },
       post: {
-        summary: "Tambah hewan",
+        summary: "Menambah Hewan Baru",
         tags: ["Hewan"],
         requestBody: {
           content: {
@@ -37,10 +36,10 @@ const swaggerSpec = {
               schema: {
                 type: "object",
                 properties: {
-                  name: { type: "string" },
-                  category: { type: "string" },
-                  description: { type: "string" },
-                  image: { type: "string" }
+                  name: { type: "string", example: "Kucing Oren" },
+                  category: { type: "string", example: "Kucing" },
+                  description: { type: "string", example: "Kucing lucu" },
+                  image: { type: "string", example: "https://..." }
                 }
               }
             }
@@ -51,61 +50,31 @@ const swaggerSpec = {
     },
     "/api/animals/{id}": {
       get: {
-        summary: "Detail hewan",
+        summary: "Detail Hewan",
         tags: ["Hewan"],
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
         responses: { "200": { description: "OK" } }
       },
       delete: {
-        summary: "Hapus hewan",
+        summary: "Hapus Hewan",
         tags: ["Hewan"],
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
         responses: { "200": { description: "Deleted" } }
       }
     },
     "/api/tips": {
-      get: { summary: "Ambil semua tips", tags: ["Tips"], responses: { "200": { description: "OK" } } },
-      post: { summary: "Buat tips", tags: ["Tips"], responses: { "201": { description: "Created" } } }
+      get: { summary: "Lihat Semua Tips", tags: ["Tips"], responses: { "200": { description: "OK" } } },
+      post: { summary: "Buat Tips Baru", tags: ["Tips"], responses: { "201": { description: "Created" } } }
     },
     "/api/tips/{id}": {
-      delete: { summary: "Hapus tips", tags: ["Tips"], parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }], responses: { "200": { description: "Deleted" } } }
+      delete: { summary: "Hapus Tips", tags: ["Tips"], parameters: [{ name: "id", in: "path", required: true }], responses: { "200": { description: "Deleted" } } }
     },
     "/api/profile": {
-      get: { summary: "Lihat profil", tags: ["Profil"], responses: { "200": { description: "OK" } } },
-      put: { summary: "Update profil", tags: ["Profil"], responses: { "200": { description: "Updated" } } }
+      get: { summary: "Lihat Profil", tags: ["Profil"], responses: { "200": { description: "OK" } } },
+      put: { summary: "Update Profil", tags: ["Profil"], responses: { "200": { description: "Updated" } } }
     }
   }
 };
-
-app.get('/api/docs', (req, res) => {
-  res.setHeader('Content-Type', 'text/html');
-  res.send(`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <title>PetPedia API Docs</title>
-      <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui.css" />
-      <style>body { margin: 0; padding: 0; }</style>
-    </head>
-    <body>
-      <div id="swagger-ui"></div>
-      <script src="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui-bundle.js"></script>
-      <script src="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui-standalone-preset.js"></script>
-      <script>
-        window.onload = () => {
-          window.ui = SwaggerUIBundle({
-            spec: ${JSON.stringify(swaggerSpec)},
-            dom_id: '#swagger-ui',
-            presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
-            layout: "BaseLayout"
-          });
-        };
-      </script>
-    </body>
-    </html>
-  `);
-});
 
 const supabaseUrl = 'https://trnpudlxvcxckxlrjlqe.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRybnB1ZGx4dmN4Y2t4bHJqbHFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwNjMzNDQsImV4cCI6MjA3OTYzOTM0NH0.m_NmgeMnTQSul_oqX00aGePbgzaabddhA8d95kcb84g';
@@ -119,6 +88,30 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' })); 
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+app.get('/api/docs', (req, res) => {
+  res.setHeader('Content-Type', 'text/html');
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>PetPedia API Docs</title>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
+        <style>body { margin: 0; padding: 0; }</style>
+      </head>
+      <body>
+        <redoc spec-url='/api/docs-json'></redoc>
+        <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"> </script>
+      </body>
+    </html>
+  `);
+});
+
+app.get('/api/docs-json', (req, res) => {
+  res.json(apiDocs);
+});
+
 app.get('/', (req, res) => res.send('Server PetPedia Jalan!'));
 
 app.get('/api/animals', async (req, res) => {
@@ -126,6 +119,7 @@ app.get('/api/animals', async (req, res) => {
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 });
+
 app.post('/api/animals', async (req, res) => {
   const { name, category, description, image } = req.body;
   try {
@@ -134,12 +128,14 @@ app.post('/api/animals', async (req, res) => {
     res.status(201).json({ message: 'Sukses', data });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
+
 app.get('/api/animals/:id', async (req, res) => {
   const { id } = req.params;
   const { data, error } = await supabase.from('animals').select('*').eq('id', id).single();
   if (error) return res.status(404).json({ error: 'Tidak ketemu' });
   res.json(data);
 });
+
 app.delete('/api/animals/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -157,7 +153,7 @@ app.get('/api/tips', async (req, res) => {
 app.get('/api/tips/:id', async (req, res) => {
   const { id } = req.params;
   const { data, error } = await supabase.from('tips').select('*').eq('id', id).single();
-  if (error) return res.status(404).json({ error: 'Tidak ketemu' });
+  if (error) return res.status(404).json({ error: 'Tidak ditemukan' });
   res.json(data);
 });
 app.post('/api/tips', async (req, res) => {
@@ -179,24 +175,20 @@ app.delete('/api/tips/:id', async (req, res) => {
 });
 
 app.get('/api/profile', async (req, res) => {
-  try {
-    const { data, error } = await supabase.from('profile').select('*').limit(1).single();
-    if (error) return res.json({ name: 'User', bio: '-', avatar: '' });
-    res.json(data);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  const { data, error } = await supabase.from('profile').select('*').limit(1).single();
+  if (error) return res.json({ name: 'User', bio: '-', avatar: '' });
+  res.json(data);
 });
 app.put('/api/profile', async (req, res) => {
   const { name, bio, nim, angkatan, univ, avatar } = req.body;
   try {
     const { data: existing } = await supabase.from('profile').select('id').limit(1);
-    let result;
     if (existing && existing.length > 0) {
-      result = await supabase.from('profile').update({ name, bio, nim, angkatan, univ, avatar }).eq('id', existing[0].id).select();
+      await supabase.from('profile').update({ name, bio, nim, angkatan, univ, avatar }).eq('id', existing[0].id);
     } else {
-      result = await supabase.from('profile').insert([{ name, bio, nim, angkatan, univ, avatar }]).select();
+      await supabase.from('profile').insert([{ name, bio, nim, angkatan, univ, avatar }]);
     }
-    if (result.error) throw result.error;
-    res.json({ message: 'Profile updated!', data: result.data });
+    res.json({ message: 'Profile updated!' });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
