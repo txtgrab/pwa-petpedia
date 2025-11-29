@@ -154,6 +154,93 @@ app.delete('/api/tips/:id', async (req, res) => {
   }
 });
 
+app.get('/api/docs', (req, res) => {
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>PetPedia API Documentation</title>
+      <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; color: #333; }
+        h1 { color: #4CAF50; border-bottom: 2px solid #4CAF50; padding-bottom: 10px; }
+        h2 { margin-top: 30px; color: #555; }
+        .endpoint { background: #f4f4f4; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid #4CAF50; }
+        .method { font-weight: bold; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.9em; margin-right: 10px; }
+        .get { background-color: #61affe; }
+        .post { background-color: #49cc90; }
+        .put { background-color: #fca130; }
+        .delete { background-color: #f93e3e; }
+        .url { font-family: monospace; font-weight: bold; }
+        code { background: #eee; padding: 2px 5px; border-radius: 4px; }
+      </style>
+    </head>
+    <body>
+      <h1>📘 Dokumentasi API PetPedia</h1>
+      <p>Selamat datang di dokumentasi resmi REST API untuk aplikasi PetPedia.</p>
+      
+      <h2>🐾 Hewan (Animals)</h2>
+      
+      <div class="endpoint">
+        <span class="method get">GET</span> <span class="url">/api/animals</span>
+        <p>Mengambil semua daftar hewan.</p>
+      </div>
+      
+      <div class="endpoint">
+        <span class="method get">GET</span> <span class="url">/api/animals/:id</span>
+        <p>Mengambil detail satu hewan berdasarkan ID.</p>
+      </div>
+
+      <div class="endpoint">
+        <span class="method post">POST</span> <span class="url">/api/animals</span>
+        <p>Menambahkan data hewan baru. (Body: name, category, description, image)</p>
+      </div>
+
+      <div class="endpoint">
+        <span class="method delete">DELETE</span> <span class="url">/api/animals/:id</span>
+        <p>Menghapus hewan berdasarkan ID.</p>
+      </div>
+
+      <h2>📚 Tips & Edukasi</h2>
+
+      <div class="endpoint">
+        <span class="method get">GET</span> <span class="url">/api/tips</span>
+        <p>Mengambil daftar semua artikel tips.</p>
+      </div>
+
+      <div class="endpoint">
+        <span class="method post">POST</span> <span class="url">/api/tips</span>
+        <p>Membuat artikel tips baru.</p>
+      </div>
+
+      <div class="endpoint">
+        <span class="method delete">DELETE</span> <span class="url">/api/tips/:id</span>
+        <p>Menghapus artikel tips.</p>
+      </div>
+
+      <h2>👤 Profil User</h2>
+
+      <div class="endpoint">
+        <span class="method get">GET</span> <span class="url">/api/profile</span>
+        <p>Mengambil data profil mahasiswa.</p>
+      </div>
+
+      <div class="endpoint">
+        <span class="method put">PUT</span> <span class="url">/api/profile</span>
+        <p>Mengupdate data profil (Nama, NIM, Foto, dll).</p>
+      </div>
+
+      <footer style="margin-top: 50px; text-align: center; color: #888; font-size: 0.9em;">
+        &copy; 2025 PetPedia Backend System
+      </footer>
+    </body>
+    </html>
+  `;
+  res.send(htmlContent);
+});
+
+
 app.listen(PORT, () => {
   console.log(`🚀 Server Backend SIAP di http://localhost:${PORT}`);
 });
