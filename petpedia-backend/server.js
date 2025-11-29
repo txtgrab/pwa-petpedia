@@ -240,6 +240,13 @@ app.get('/api/docs', (req, res) => {
   res.send(htmlContent);
 });
 
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const path = require('path');
+
+const swaggerDocument = YAML.load(path.join(__dirname, 'api-docs.yaml'));
+
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.listen(PORT, () => {
   console.log(`🚀 Server Backend SIAP di http://localhost:${PORT}`);

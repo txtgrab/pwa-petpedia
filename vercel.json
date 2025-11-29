@@ -3,7 +3,8 @@
     "builds": [
       {
         "src": "petpedia-backend/server.js",
-        "use": "@vercel/node"
+        "use": "@vercel/node",
+        "config": { "includeFiles": ["petpedia-backend/api-docs.yaml"] }
       },
       {
         "src": "petpedia-pwa/package.json",
@@ -12,6 +13,10 @@
       }
     ],
     "routes": [
+      {
+        "src": "/api/docs",
+        "dest": "/petpedia-backend/server.js"
+      },
       {
         "src": "/api/(.*)",
         "dest": "/petpedia-backend/server.js"

@@ -1,0 +1,146 @@
+openapi: 3.0.0
+info:
+  title: PetPedia API
+  description: Dokumentasi API resmi untuk aplikasi PWA PetPedia.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Local Server
+  - url: https://pwa-petpedia.vercel.app
+    description: Production Server
+
+paths:
+  /api/animals:
+    get:
+      summary: Ambil semua data hewan
+      tags: [Hewan]
+      responses:
+        200:
+          description: Berhasil mengambil data
+    post:
+      summary: Tambah hewan baru
+      tags: [Hewan]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                category:
+                  type: string
+                description:
+                  type: string
+                image:
+                  type: string
+      responses:
+        201:
+          description: Hewan berhasil ditambahkan
+
+  /api/animals/{id}:
+    get:
+      summary: Ambil detail hewan berdasarkan ID
+      tags: [Hewan]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Detail hewan ditemukan
+    delete:
+      summary: Hapus hewan berdasarkan ID
+      tags: [Hewan]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Hewan berhasil dihapus
+
+  /api/tips:
+    get:
+      summary: Ambil semua artikel tips
+      tags: [Tips & Edukasi]
+      responses:
+        200:
+          description: Berhasil mengambil data tips
+    post:
+      summary: Buat tips baru
+      tags: [Tips & Edukasi]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                summary:
+                  type: string
+                content:
+                  type: string
+                category:
+                  type: string
+                author:
+                  type: string
+                image:
+                  type: string
+      responses:
+        201:
+          description: Tips berhasil dibuat
+
+  /api/tips/{id}:
+    delete:
+      summary: Hapus tips berdasarkan ID
+      tags: [Tips & Edukasi]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Tips berhasil dihapus
+
+  /api/profile:
+    get:
+      summary: Ambil data profil user
+      tags: [Profil]
+      responses:
+        200:
+          description: Data profil ditemukan
+    put:
+      summary: Update data profil
+      tags: [Profil]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                bio:
+                  type: string
+                nim:
+                  type: string
+                angkatan:
+                  type: string
+                univ:
+                  type: string
+                avatar:
+                  type: string
+      responses:
+        200:
+          description: Profil berhasil diupdate
