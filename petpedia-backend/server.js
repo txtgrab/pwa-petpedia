@@ -6,7 +6,6 @@ if (!globalThis.fetch) {
 const express = require('express');
 const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
-const swaggerUi = require('swagger-ui-express');
 
 const app = express();
 const PORT = 3000;
@@ -14,13 +13,16 @@ const PORT = 3000;
 const swaggerDocument = {
   "openapi": "3.0.0",
   "info": {
-    "title": "PetPedia API",
-    "description": "Dokumentasi API resmi untuk aplikasi PWA PetPedia.",
-    "version": "1.0.0"
+    "title": "PetPedia API Documentation",
+    "description": "Dokumentasi lengkap REST API untuk aplikasi PWA PetPedia.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Fajar Herdiansyah"
+    }
   },
   "servers": [
     { "url": "https://pwa-petpedia.vercel.app", "description": "Production Server" },
-    { "url": "http://localhost:3000", "description": "Local Server" }
+    { "url": "http://localhost:3000", "description": "Local Development" }
   ],
   "paths": {
     "/api/animals": {
@@ -48,7 +50,7 @@ const swaggerDocument = {
             }
           }
         },
-        "responses": { "201": { "description": "Hewan berhasil ditambahkan" } }
+        "responses": { "201": { "description": "Sukses" } }
       }
     },
     "/api/animals/{id}": {
@@ -69,12 +71,12 @@ const swaggerDocument = {
       "get": {
         "summary": "Ambil semua tips",
         "tags": ["Tips"],
-        "responses": { "200": { "description": "Berhasil mengambil tips" } }
+        "responses": { "200": { "description": "Sukses" } }
       },
       "post": {
         "summary": "Buat tips baru",
         "tags": ["Tips"],
-        "responses": { "201": { "description": "Tips dibuat" } }
+        "responses": { "201": { "description": "Sukses" } }
       }
     },
     "/api/tips/{id}": {
@@ -82,19 +84,19 @@ const swaggerDocument = {
         "summary": "Hapus tips",
         "tags": ["Tips"],
         "parameters": [ { "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } } ],
-        "responses": { "200": { "description": "Tips dihapus" } }
+        "responses": { "200": { "description": "Dihapus" } }
       }
     },
     "/api/profile": {
       "get": {
-        "summary": "Ambil profil user",
+        "summary": "Ambil profil",
         "tags": ["Profil"],
-        "responses": { "200": { "description": "Profil ditemukan" } }
+        "responses": { "200": { "description": "Sukses" } }
       },
       "put": {
         "summary": "Update profil",
         "tags": ["Profil"],
-        "responses": { "200": { "description": "Profil diupdate" } }
+        "responses": { "200": { "description": "Sukses" } }
       }
     }
   }
@@ -112,8 +114,44 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' })); 
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.get('/', (req, res) => res.send('Server PetPedia Jalan Lancar!'));
+app.get('/api/docs', (req, res) => {
+  res.setHeader('Content-Type', 'text/html');
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>PetPedia API Docs</title>
+      <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist/swagger-ui.css" />
+      <style>
+        body { margin: 0; padding: 0; }
+        .swagger-ui .topbar { display: none; } 
+      </style>
+    </head>
+    <body>
+      <div id="swagger-ui"></div>
+      <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js" charset="UTF-8"> </script>
+      <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js" charset="UTF-8"> </script>
+      <script>
+        window.onload = function() {
+          const ui = SwaggerUIBundle({
+            spec: ${JSON.stringify(swaggerDocument)},
+            dom_id: '#swagger-ui',
+            deepLinking: true,
+            presets: [
+              SwaggerUIBundle.presets.apis,
+              SwaggerUIStandalonePreset
+            ],
+            layout: "BaseLayout"
+          });
+        };
+      </script>
+    </body>
+    </html>
+  `);
+});
+
+app.get('/', (req, res) => res.send('Server PetPedia Jalan!'));
 
 app.get('/api/animals', async (req, res) => {
   const { data, error } = await supabase.from('animals').select('*').order('id', { ascending: true });
@@ -144,7 +182,7 @@ app.delete('/api/animals/:id', async (req, res) => {
   try {
     const { error } = await supabase.from('animals').delete().eq('id', id);
     if (error) throw error;
-    res.json({ message: 'Hewan berhasil dihapus!' });
+    res.json({ message: 'Berhasil dihapus' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
