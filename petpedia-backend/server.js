@@ -11,67 +11,112 @@ const app = express();
 const PORT = 3000;
 
 const apiDocs = {
-  openapi: "3.0.0",
-  info: {
-    title: "PetPedia API Documentation",
-    version: "1.0.0",
-    description: "Dokumentasi Lengkap API PetPedia. Dibuat oleh Fajar Herdiansyah."
+  "openapi": "3.0.0",
+  "info": {
+    "title": "PetPedia API Documentation",
+    "description": "Dokumentasi REST API resmi untuk aplikasi PetPedia PWA. Dibuat untuk Tugas Akhir.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Fajar Herdiansyah"
+    }
   },
-  servers: [
-    { url: "https://pwa-petpedia.vercel.app", description: "Server Utama" }
+  "servers": [
+    { "url": "https://pwa-petpedia.vercel.app", "description": "Server Vercel (Production)" },
+    { "url": "http://localhost:3000", "description": "Server Lokal (Development)" }
   ],
-  paths: {
+  "tags": [
+    { "name": "Hewan", "description": "Manajemen data hewan peliharaan" },
+    { "name": "Tips", "description": "Manajemen artikel edukasi" },
+    { "name": "Profil", "description": "Manajemen data pengguna" }
+  ],
+  "paths": {
     "/api/animals": {
-      get: {
-        summary: "Melihat Semua Hewan",
-        tags: ["Hewan"],
-        responses: { "200": { description: "Berhasil" } }
+      "get": {
+        "tags": ["Hewan"],
+        "summary": "Ambil semua data hewan",
+        "responses": {
+          "200": { "description": "Berhasil mendapatkan list hewan" },
+          "500": { "description": "Server Error" }
+        }
       },
-      post: {
-        summary: "Menambah Hewan Baru",
-        tags: ["Hewan"],
-        requestBody: {
-          content: {
+      "post": {
+        "tags": ["Hewan"],
+        "summary": "Tambah hewan baru",
+        "requestBody": {
+          "required": true,
+          "content": {
             "application/json": {
-              schema: {
-                type: "object",
-                properties: {
-                  name: { type: "string", example: "Kucing Oren" },
-                  category: { type: "string", example: "Kucing" },
-                  description: { type: "string", example: "Kucing lucu" },
-                  image: { type: "string", example: "https://..." }
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "Kucing Anggora" },
+                  "category": { "type": "string", "example": "Kucing" },
+                  "description": { "type": "string", "example": "Bulu lebat dan lucu" },
+                  "image": { "type": "string", "example": "https://images.unsplash.com/..." }
                 }
               }
             }
           }
         },
-        responses: { "201": { description: "Created" } }
+        "responses": {
+          "201": { "description": "Hewan berhasil ditambahkan" }
+        }
       }
     },
     "/api/animals/{id}": {
-      get: {
-        summary: "Detail Hewan",
-        tags: ["Hewan"],
-        parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
-        responses: { "200": { description: "OK" } }
+      "get": {
+        "tags": ["Hewan"],
+        "summary": "Ambil detail satu hewan",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Detail ditemukan" },
+          "404": { "description": "Hewan tidak ditemukan" }
+        }
       },
-      delete: {
-        summary: "Hapus Hewan",
-        tags: ["Hewan"],
-        parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
-        responses: { "200": { description: "Deleted" } }
+      "delete": {
+        "tags": ["Hewan"],
+        "summary": "Hapus hewan berdasarkan ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Berhasil dihapus" }
+        }
       }
     },
     "/api/tips": {
-      get: { summary: "Lihat Semua Tips", tags: ["Tips"], responses: { "200": { description: "OK" } } },
-      post: { summary: "Buat Tips Baru", tags: ["Tips"], responses: { "201": { description: "Created" } } }
+      "get": {
+        "tags": ["Tips"],
+        "summary": "Ambil semua tips edukasi",
+        "responses": { "200": { "description": "OK" } }
+      },
+      "post": {
+        "tags": ["Tips"],
+        "summary": "Buat tips baru",
+        "responses": { "201": { "description": "Created" } }
+      }
     },
     "/api/tips/{id}": {
-      delete: { summary: "Hapus Tips", tags: ["Tips"], parameters: [{ name: "id", in: "path", required: true }], responses: { "200": { description: "Deleted" } } }
+      "delete": {
+        "tags": ["Tips"],
+        "summary": "Hapus tips",
+        "parameters": [{ "name": "id", "in": "path", "required": true }],
+        "responses": { "200": { "description": "Deleted" } }
+      }
     },
     "/api/profile": {
-      get: { summary: "Lihat Profil", tags: ["Profil"], responses: { "200": { description: "OK" } } },
-      put: { summary: "Update Profil", tags: ["Profil"], responses: { "200": { description: "Updated" } } }
+      "get": {
+        "tags": ["Profil"],
+        "summary": "Lihat data profil",
+        "responses": { "200": { "description": "OK" } }
+      },
+      "put": {
+        "tags": ["Profil"],
+        "summary": "Update atau buat data profil",
+        "responses": { "200": { "description": "Updated" } }
+      }
     }
   }
 };
@@ -92,34 +137,48 @@ app.get('/api/docs', (req, res) => {
   res.setHeader('Content-Type', 'text/html');
   res.send(`
     <!DOCTYPE html>
-    <html>
-      <head>
-        <title>PetPedia API Docs</title>
-        <meta charset="utf-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
-        <style>body { margin: 0; padding: 0; }</style>
-      </head>
-      <body>
-        <redoc spec-url='/api/docs-json'></redoc>
-        <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"> </script>
-      </body>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>PetPedia API Docs</title>
+      <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css" />
+      <style>
+        body { margin: 0; padding: 0; background: #fafafa; }
+        .swagger-ui .topbar { display: none; } /* Sembunyikan baris hijau atas */
+      </style>
+    </head>
+    <body>
+      <div id="swagger-ui"></div>
+      <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js" crossorigin></script>
+      <script>
+        window.onload = () => {
+          window.ui = SwaggerUIBundle({
+            spec: ${JSON.stringify(apiDocs)}, // DATA JSON DI-INJECT LANGSUNG KESINI
+            dom_id: '#swagger-ui',
+            presets: [
+              SwaggerUIBundle.presets.apis,
+              SwaggerUIStandalonePreset
+            ],
+            layout: "BaseLayout",
+            deepLinking: true,
+            displayRequestDuration: true,
+            docExpansion: "list"
+          });
+        };
+      </script>
+    </body>
     </html>
   `);
 });
 
-app.get('/api/docs-json', (req, res) => {
-  res.json(apiDocs);
-});
 
-app.get('/', (req, res) => res.send('Server PetPedia Jalan!'));
+app.get('/', (req, res) => res.send('Server PetPedia Berjalan!'));
 
 app.get('/api/animals', async (req, res) => {
   const { data, error } = await supabase.from('animals').select('*').order('id', { ascending: true });
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 });
-
 app.post('/api/animals', async (req, res) => {
   const { name, category, description, image } = req.body;
   try {
@@ -128,14 +187,12 @@ app.post('/api/animals', async (req, res) => {
     res.status(201).json({ message: 'Sukses', data });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
-
 app.get('/api/animals/:id', async (req, res) => {
   const { id } = req.params;
   const { data, error } = await supabase.from('animals').select('*').eq('id', id).single();
   if (error) return res.status(404).json({ error: 'Tidak ketemu' });
   res.json(data);
 });
-
 app.delete('/api/animals/:id', async (req, res) => {
   const { id } = req.params;
   try {
