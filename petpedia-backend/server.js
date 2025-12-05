@@ -63,13 +63,24 @@ app.get('/api/tips', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.get('/api/tips/:id', async (req, res) => {
+app.put('/api/tips/:id', async (req, res) => {
   const { id } = req.params;
+  const { title, summary, content, category, author, image } = req.body;
+  
+  console.log("📩 Request Edit Tips ID:", id);
+
   try {
-    const { data, error } = await supabase.from('tips').select('*').eq('id', id).single();
+    const { data, error } = await supabase
+      .from('tips')
+      .update({ title, summary, content, category, author, image })
+      .eq('id', id)
+      .select();
+
     if (error) throw error;
-    res.json(data);
-  } catch (err) { res.status(404).json({ error: 'Tidak ditemukan' }); }
+    res.json({ message: 'Tips berhasil diupdate!', data });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.post('/api/tips', async (req, res) => {

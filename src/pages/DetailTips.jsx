@@ -1,27 +1,54 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaArrowLeft, FaUser, FaCalendarDay, FaTag } from 'react-icons/fa';
+import { FaArrowLeft, FaUser, FaCalendarDay, FaTag, FaEdit, FaSave, FaTimes } from 'react-icons/fa';
 
 const DetailTips = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  
   const [tip, setTip] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  // STATE UNTUK MODE EDIT
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({}); // Data sementara saat diedit
 
+  // 1. AMBIL DATA AWAL
   useEffect(() => {
-    const fetchDetail = async () => {
-      try {
-        const response = await axios.get(`http://127.0.0.1:3000/api/tips/${id}`);
-        setTip(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error:", error);
-        setLoading(false);
-      }
-    };
     fetchDetail();
   }, [id]);
+
+  const fetchDetail = async () => {
+    try {
+      // Ganti URL ke Vercel atau Localhost sesuai kondisi
+      const response = await axios.get(`http://localhost:3000/api/tips/${id}`); // Ganti ke URL Backendmu
+      setTip(response.data);
+      setFormData(response.data); // Siapkan data untuk diedit
+      setLoading(false);
+    } catch (error) {
+      console.error("Error:", error);
+      setLoading(false);
+    }
+  };
+
+  // 2. HANDLE PERUBAHAN INPUT
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // 3. HANDLE SIMPAN PERUBAHAN
+  const handleSave = async () => {
+    try {
+      await axios.put(`http://localhost:3000/api/tips/${id}`, formData);
+      alert("Artikel berhasil diperbarui!");
+      setTip(formData); // Update tampilan utama
+      setIsEditing(false); // Keluar mode edit
+    } catch (error) {
+      alert("Gagal mengupdate tips.");
+      console.error(error);
+    }
+  };
 
   if (loading) return <div style={{textAlign:'center', marginTop:50}}>Loading...</div>;
   if (!tip) return <div style={{textAlign:'center', marginTop:50}}>Artikel tidak ditemukan.</div>;
@@ -29,39 +56,81 @@ const DetailTips = () => {
   return (
     <div style={styles.container}>
       
-      {}
-      <button onClick={() => navigate(-1)} style={styles.backButton}>
-        <FaArrowLeft size={20} /> {}
-      </button>
+      {/* Tombol Kembali */}
+      {!isEditing && (
+        <button onClick={() => navigate(-1)} style={styles.backButton}>
+            <FaArrowLeft size={20} color="#000" />
+        </button>
+      )}
 
       {}
-      <div style={styles.heroImageContainer}>
-        <img src={tip.image} alt={tip.title} style={styles.heroImage} />
-        <div style={styles.heroOverlay}></div>
-        <span style={styles.categoryTag}><FaTag size={10} /> {tip.category}</span>
-      </div>
+      {isEditing ? (
+        <div style={styles.editWrapper}>
+            <h2 style={{marginBottom: 20}}>Edit Artikel</h2>
+            
+            <label style={styles.label}>Judul</label>
+            <input name="title" value={formData.title} onChange={handleChange} style={styles.input} />
+            
+            <label style={styles.label}>Link Gambar</label>
+            <input name="image" value={formData.image} onChange={handleChange} style={styles.input} />
 
-      {}
-      <div style={styles.contentWrapper}>
-        <h1 style={styles.title}>{tip.title}</h1>
-        
-        <div style={styles.metaData}>
-            <div style={styles.metaItem}>
-                <FaUser size={12} color="#4CAF50"/>
-                <span>{tip.author}</span>
+            <div style={{display:'flex', gap: 10}}>
+                <div style={{flex:1}}>
+                    <label style={styles.label}>Kategori</label>
+                    <input name="category" value={formData.category} onChange={handleChange} style={styles.input} />
+                </div>
+                <div style={{flex:1}}>
+                    <label style={styles.label}>Penulis</label>
+                    <input name="author" value={formData.author} onChange={handleChange} style={styles.input} />
+                </div>
             </div>
-            <div style={styles.metaItem}>
-                <FaCalendarDay size={12} color="#4CAF50"/>
-                <span>{tip.date}</span>
+
+            <label style={styles.label}>Ringkasan (Summary)</label>
+            <textarea name="summary" value={formData.summary} onChange={handleChange} style={styles.textareaShort} />
+
+            <label style={styles.label}>Isi Konten Lengkap</label>
+            <textarea name="content" value={formData.content} onChange={handleChange} style={styles.textareaLong} />
+
+            <div style={styles.actionButtons}>
+                <button onClick={() => setIsEditing(false)} style={styles.btnCancel}><FaTimes/> Batal</button>
+                <button onClick={handleSave} style={styles.btnSave}><FaSave/> Simpan Perubahan</button>
             </div>
         </div>
+      ) : (
+        <>
+          {}
+          <button onClick={() => setIsEditing(true)} style={styles.editFloatBtn}>
+            <FaEdit />
+          </button>
 
-        <hr style={styles.divider} />
+          <div style={styles.heroImageContainer}>
+            <img src={tip.image} alt={tip.title} style={styles.heroImage} />
+            <div style={styles.heroOverlay}></div>
+            <span style={styles.categoryTag}><FaTag size={10} /> {tip.category}</span>
+          </div>
 
-        <article style={styles.articleBody}>
-            {tip.content}
-        </article>
-      </div>
+          <div style={styles.contentWrapper}>
+            <h1 style={styles.title}>{tip.title}</h1>
+            
+            <div style={styles.metaData}>
+                <div style={styles.metaItem}>
+                    <FaUser size={12} color="#4CAF50"/>
+                    <span>{tip.author}</span>
+                </div>
+                <div style={styles.metaItem}>
+                    <FaCalendarDay size={12} color="#4CAF50"/>
+                    <span>{tip.date}</span>
+                </div>
+            </div>
+
+            <hr style={styles.divider} />
+
+            <article style={styles.articleBody}>
+                {tip.content}
+            </article>
+          </div>
+        </>
+      )}
     </div>
   );
 };
@@ -70,27 +139,23 @@ const styles = {
   container: { background: 'white', minHeight: '100vh', paddingBottom: '80px', maxWidth: '600px', margin: '0 auto', position: 'relative' },
   
   backButton: {
-    position: 'absolute', 
-    top: '20px', 
-    left: '20px', 
-    zIndex: 100, 
-    backgroundColor: 'white', 
-    color: '#333', 
-    border: 'none', 
-    borderRadius: '50%', 
-    width: '45px', 
-    height: '45px', 
-    display: 'flex', 
-    alignItems: 'center', 
-    justifyContent: 'center',
-    cursor: 'pointer', 
-    boxShadow: '0 4px 10px rgba(0,0,0,0.3)' 
+    position: 'absolute', top: '20px', left: '20px', zIndex: 10,
+    backgroundColor: 'white', border: 'none', borderRadius: '50%',
+    width: '45px', height: '45px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.3)'
+  },
+
+  editFloatBtn: {
+    position: 'absolute', top: '20px', right: '20px', zIndex: 10,
+    backgroundColor: 'white', color: '#4CAF50',
+    border: 'none', borderRadius: '50%',
+    width: '45px', height: '45px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.3)', fontSize: '18px'
   },
 
   heroImageContainer: { width: '100%', height: '250px', position: 'relative' },
   heroImage: { width: '100%', height: '100%', objectFit: 'cover' },
   heroOverlay: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5))' },
-  
   categoryTag: {
     position: 'absolute', bottom: '15px', left: '20px',
     background: '#4CAF50', color: 'white', padding: '5px 12px',
@@ -103,7 +168,17 @@ const styles = {
   metaData: { display: 'flex', gap: '20px', fontSize: '13px', color: '#666', marginBottom: '20px' },
   metaItem: { display: 'flex', alignItems: 'center', gap: '8px' },
   divider: { border: 'none', borderTop: '1px solid #eee', margin: '0 0 20px 0' },
-  articleBody: { fontSize: '16px', lineHeight: '1.8', color: '#444', textAlign: 'justify', whiteSpace: 'pre-line' }
+  articleBody: { fontSize: '16px', lineHeight: '1.8', color: '#444', textAlign: 'justify', whiteSpace: 'pre-line' },
+
+  editWrapper: { padding: '20px' },
+  label: { display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#666', marginBottom: '5px', marginTop: '10px' },
+  input: { width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '14px', boxSizing: 'border-box' },
+  textareaShort: { width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '14px', height: '60px', boxSizing: 'border-box' },
+  textareaLong: { width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '14px', height: '200px', boxSizing: 'border-box', fontFamily: 'inherit' },
+  
+  actionButtons: { display: 'flex', gap: '10px', marginTop: '20px' },
+  btnSave: { flex: 1, padding: '12px', background: '#4CAF50', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' },
+  btnCancel: { flex: 1, padding: '12px', background: '#f44336', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }
 };
 
 export default DetailTips;
