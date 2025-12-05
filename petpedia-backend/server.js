@@ -63,6 +63,15 @@ app.get('/api/tips', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+app.get('/api/tips/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { data, error } = await supabase.from('tips').select('*').eq('id', id).single();
+    if (error) throw error;
+    res.json(data);
+  } catch (err) { res.status(404).json({ error: 'Tidak ditemukan' }); }
+});
+
 app.put('/api/tips/:id', async (req, res) => {
   const { id } = req.params;
   const { title, summary, content, category, author, image } = req.body;
